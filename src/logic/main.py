@@ -8,8 +8,6 @@ import csv
 
 class LogicMain(QtWidgets.QWidget):
 
-	cartas_juego = ['fuego', 'agua', 'hielo']
-
 	def __init__(self, dir_filepath_one, dir_filepath_two, content_file_one, content_file_two, btnFileFirst, btnFileSecond, textAreaFirst, textAreaSecond):
 		super(LogicMain, self).__init__()
 		self.dir_filepath_one = dir_filepath_one
@@ -35,6 +33,16 @@ class LogicMain(QtWidgets.QWidget):
 	def put_message(self, message, textarea):
 		self.textAreaFirst.appendPlainText(message) if textarea == 'first' else self.textAreaSecond.appendPlainText(message)
 
+	def fixInputs(self, array_value):
+		return_value = []
+		for value in array_value:
+			value[0] = value[0][:-2] if value[0].endswith('.0') else value[0]
+			value[2] = value[2][:-2] if value[2].endswith('.0') else value[2]
+			value[3] = value[3].replace('$', '').replace(' ', '')
+			value[3] = value[3].replace('.', '').replace(',', '.') if ',' in value[3] else value[3]
+			return_value.append(value)
+		return return_value
+
 	def compare_txt(self, file_path):
 		with open(file_path) as file_content:
 			return [value.replace('\n', '').split(';') for value in file_content]
@@ -47,7 +55,7 @@ class LogicMain(QtWidgets.QWidget):
 				value[0] = value[0].replace('\t', '')
 				if value[0] != '':
 					value_to_array.append(value[0].replace('\t', '').split(';'))
-			return value_to_array
+			return self.fixInputs(value_to_array)
 
 	def compare_xls(self, file_path):
 		value_to_array = []
@@ -55,9 +63,12 @@ class LogicMain(QtWidgets.QWidget):
 			for row in range(0, value.nrows):
 				row_value = []
 				for col in range(0, value.ncols):
-					row_value.append(str(value.cell(row, col).value))
+					val = str(value.cell(row, col).value)
+					if row != 0 and (col == 0 or col == 2):
+						val = val[:-2] if val.endswith('.0') else val
+					row_value.append(val)
 				value_to_array.append(row_value)
-		return value_to_array
+		return self.fixInputs(value_to_array)
 
 	def determinate_type_file(self, file_path):
 		if '.txt' in file_path:
@@ -68,7 +79,7 @@ class LogicMain(QtWidgets.QWidget):
 			return self.compare_xls(file_path)
 
 	def check_file_code(self, value, key, input_type, textarea):
-		value = ''.join(c for c in value if c != '.')
+		value = value[:-2] if value.endswith('.0') else value
 		try:
 			if len(value) != 10:
 				self.put_message('El '+input_type+' no tiene longitud de 10 en el elemento N° '+str(key+1), textarea)
@@ -83,17 +94,9 @@ class LogicMain(QtWidgets.QWidget):
 			self. put_message('El '+input_type+' excede la longitud 30 en el elemento N° '+str(key+1), textarea)
 
 	def check_file_cash(self, value, key, input_type, textarea):
-		value = value.replace('$', '').replace(' ', '').replace('.', '').replace(',', '.')
 		try:
-			if '.' in value:
-				compare_value = len(value.split('.')[0]) + len(value.split('.')[1])
-			elif ',' in value:
-				compare_value = len(value.split(',')[0]) + len(value.split(',')[1])
-			else:
-				compare_value = len(value)
-			if compare_value > 10:
+			if len(str(float(value))) > 10:
 				self.put_message('El '+input_type+' no tiene longitud de 10 en el elemento N° '+str(key+1), textarea)
-			value = float(value)
 		except ValueError:
 			self.put_message('El '+input_type+' no es un valor válido en el elemento N° '+str(key+1), textarea)
 
@@ -101,9 +104,6 @@ class LogicMain(QtWidgets.QWidget):
 		if file_1 != file_2:
 			self.put_message('El '+text+' es distinto del archivo 2 del elemento N° '+str(key+1), 'first')
 			self.put_message('El '+text+' es distinto del archivo 1 del elemento N° '+str(key+1), 'second')
-		else:
-			self.put_message('El '+text+' es igual que el archivo 2 del elemento N° '+str(key+1), 'first')
-			self.put_message('El '+text+' es igual que el archivo 1 del elemento N° '+str(key+1), 'second')
 
 	def compareFiles(self):
 		self.textAreaFirst.clear()
@@ -146,7 +146,7 @@ class LogicMain(QtWidgets.QWidget):
 						# Valor
 						self.check_file_cash(value[3], key, 'valor', 'first')
 						self.check_file_cash(file_path_two[key][3], key, 'valor', 'second')
-						self.compare_value_equals(key, 'valor', value[3], file_path_two[key][3])
+						self.compare_value_equals(key, 'valor', float(value[3]), float(file_path_two[key][3]))
 						# Concepto
 						self.check_file_string(value[4], key, 'concepto', 'first')
 						self.check_file_string(file_path_two[key][4], key, 'concepto', 'second')
