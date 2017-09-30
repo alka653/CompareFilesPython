@@ -82,28 +82,28 @@ class LogicMain(QtWidgets.QWidget):
 		value = value[:-2] if value.endswith('.0') else value
 		try:
 			if len(value) != 10:
-				self.put_message('El '+input_type+' no tiene longitud de 10 en el elemento N° '+str(key+1), textarea)
+				self.put_message('El '+input_type+' no tiene longitud de 10 en el elemento N° '+str(key+1)+' ('+str(value)+')', textarea)
 			value = int(value)
 		except ValueError:
-			self.put_message('El '+input_type+' no es numérico en el elemento N° '+str(key+1), textarea)
+			self.put_message('El '+input_type+' no es numérico en el elemento N° '+str(key+1)+' ('+str(value)+')', textarea)
 
 	def check_file_string(self, value, key, input_type, textarea):
 		if not isinstance(value, str):
-			self. put_message('El '+input_type+' no tiene un nombre válido en el elemento N° '+str(key+1), textarea)
+			self. put_message('El '+input_type+' no tiene un nombre válido en el elemento N° '+str(key+1)+' ('+str(value)+')', textarea)
 		if len(value) > 30:
-			self. put_message('El '+input_type+' excede la longitud 30 en el elemento N° '+str(key+1), textarea)
+			self. put_message('El '+input_type+' excede la longitud 30 en el elemento N° '+str(key+1)+' ('+str(value)+')', textarea)
 
 	def check_file_cash(self, value, key, input_type, textarea):
 		try:
 			if len(str(float(value))) > 10:
-				self.put_message('El '+input_type+' no tiene longitud de 10 en el elemento N° '+str(key+1), textarea)
+				self.put_message('El '+input_type+' no tiene longitud de 10 en el elemento N° '+str(key+1)+' ('+str(value)+')', textarea)
 		except ValueError:
-			self.put_message('El '+input_type+' no es un valor válido en el elemento N° '+str(key+1), textarea)
+			self.put_message('El '+input_type+' no es un valor válido en el elemento N° '+str(key+1)+' ('+str(value)+')', textarea)
 
 	def compare_value_equals(self, key, text, file_1, file_2):
 		if file_1 != file_2:
-			self.put_message('El '+text+' es distinto del archivo 2 del elemento N° '+str(key+1), 'first')
-			self.put_message('El '+text+' es distinto del archivo 1 del elemento N° '+str(key+1), 'second')
+			self.put_message('El '+text+' es distinto del archivo 2 del elemento N° '+str(key+1)+' ('+str(file_1)+')', 'first')
+			self.put_message('El '+text+' es distinto del archivo 1 del elemento N° '+str(key+1)+' ('+str(file_2)+')', 'second')
 
 	def compareFiles(self):
 		self.textAreaFirst.clear()
