@@ -45,7 +45,7 @@ class LogicMain(QtWidgets.QWidget):
 
 	def compare_txt(self, file_path):
 		with open(file_path) as file_content:
-			return [value.replace('\n', '').split(';') for value in file_content]
+			return self.fixInputs([value.replace('\n', '').split(';') for value in file_content])
 
 	def compare_csv(self, file_path):
 		value_to_array = []
